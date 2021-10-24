@@ -3,7 +3,7 @@
 
 <mapper namespace="com.mycompany.webapp.dao.BoardDao">
 	<select id="selectByPage" parameterType="pager" resultType="board">
-		SELECT rnum, bno, btitle, bdate, mid, bhitcount
+		SELECT rnum, bno, btitle, bdate, mid
 		FROM (
 		  SELECT ROWNUM as rnum, bno, btitle, bdate, mid, bhitcount
 		  FROM (
@@ -72,5 +72,4 @@
 		UPDATE board SET bhitcount=bhitcount+1 WHERE bno=#{bno}	
 	</update>	
 </mapper>
-
 

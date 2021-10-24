@@ -1,4 +1,4 @@
-package com.mycompany.webapp.security;
+package com.mycompany.webapp.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.mycompany.webapp.dao.MemberDao;
 import com.mycompany.webapp.dto.Member;
+import com.mycompany.webapp.security.CustomUserDetails;
 
 import lombok.extern.java.Log;
 
@@ -42,4 +43,3 @@ public class CustomUserDetailsService implements UserDetailsService {
 		return userDetails;
 	}
 }
-
