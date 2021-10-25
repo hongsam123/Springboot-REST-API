@@ -1,7 +1,6 @@
 package com.mycompany.webapp.exception;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,10 +25,9 @@ public class ControllerExceptionHandler {
 	}
 	
 	@ExceptionHandler
-	public void handleOtherException(BadCredentialsException e, 
+	public void handleBadCredentialsException(BadCredentialsException e, 
 			HttpServletResponse response) throws IOException {
 		log.info(e.getMessage());
 		response.sendError(401);
 	}
 }
-

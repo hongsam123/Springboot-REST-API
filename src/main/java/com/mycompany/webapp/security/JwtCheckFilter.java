@@ -1,4 +1,4 @@
-package com.mycompany.webapp.controller;
+package com.mycompany.webapp.security;
 
 import java.io.IOException;
 
@@ -8,12 +8,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import com.mycompany.webapp.security.JwtUtil;
 
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
@@ -25,33 +24,40 @@ public class JwtCheckFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		log.info("실행");
-		//JWT 얻기
+
 		String jwt = null;
-		if(request.getHeader("Authorization")!=null && 
-				request.getHeader("Authorization").startsWith("Bearer")) {
+		if (request.getHeader("Authorization") != null && request.getHeader("Authorization").startsWith("Bearer")) {
 			jwt = request.getHeader("Authorization").substring(7);
+		}else if(request.getParameter("jwt") != null) {
+			jwt = request.getParameter("jwt");
 		}
-		log.info("jwt : " + jwt );
-		//JWT 유효성 검사
-		if(jwt!=null) {
+		log.info("jwt : " + jwt);
+
+		
+		if (jwt != null) {
+			
+			//jwt 유효성 검사
+			
 			Claims claims = JwtUtil.validateToken(jwt);
-			if(claims !=null) {
+			if (claims != null) {
 				log.info("유효한 토큰");
+				
 				String mid = JwtUtil.getMid(claims);
 				String authority = JwtUtil.getAuthority(claims);
-				log.info("mid : " + mid);
-				log.info("authority + " + authority );
-				//Security 인증 처리
-				UsernamePasswordAuthenticationToken authentication = 
-						new UsernamePasswordAuthenticationToken(mid,null,AuthorityUtils.createAuthorityList(authority));
+				log.info("mid : "+ mid);
+				log.info("authority : "+ authority);
+				
+				// 아이디와 권한을 전달하여 객체를 만든다. 
+				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(mid, null, AuthorityUtils.createAuthorityList(authority));
 				SecurityContext securityContext = SecurityContextHolder.getContext();
 				securityContext.setAuthentication(authentication);
-			}else {
+			} else {
 				log.info("유효하지 않은 토큰");
 			}
 		}
-		//다음 필터를 실행
+
+		// 다음 필터를 실행
 		filterChain.doFilter(request, response);
 	}
-	
+
 }

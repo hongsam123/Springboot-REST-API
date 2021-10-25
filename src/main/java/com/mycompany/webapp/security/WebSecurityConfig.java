@@ -21,8 +21,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.mycompany.webapp.controller.JwtCheckFilter;
-import com.mycompany.webapp.service.CustomUserDetailsService;
+import com.mycompany.webapp.security.CustomUserDetailsService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,10 +53,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		
 		//JwtCheckFilter 추가
 		JwtCheckFilter jwtCheckFilter = new JwtCheckFilter();
-		http.addFilterBefore(jwtCheckFilter, UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore(jwtCheckFilter, UsernamePasswordAuthenticationFilter.class); 
 		
-		//CORS 설정 활성화
+		//Cors 설정 활성화
 		http.cors();
+		
 	}	
 	
 	@Override
@@ -92,8 +92,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Bean
 	@Override
-	public AuthenticationManager authenticationManager() throws Exception {
-		return super.authenticationManagerBean();
+	protected AuthenticationManager authenticationManager() throws Exception {
+		return super.authenticationManager();
 	}
 	
 	@Bean
@@ -103,20 +103,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		roleHierarchyImpl.setHierarchy("ROLE_ADMIN > ROLE_MANAGER > ROLE_USER");
 		return roleHierarchyImpl;
 	}
-			
+	
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
-		CorsConfiguration conf = new CorsConfiguration(); 
-		//모든 요청 사이트 허용
+		CorsConfiguration conf = new CorsConfiguration();
+		// 모든 요청 사이트 허용
 		conf.addAllowedOrigin("*");
-		//모든 요청 방식 허용
+		// 모든 요청 방식 허용
 		conf.addAllowedMethod("*");
-		//모든 요청 헤드 허용
+		// 모든 요청 헤더 허용
 		conf.addAllowedHeader("*");
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", conf);
 		return source;
 	}
+			
 }
  
  

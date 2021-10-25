@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class BoardController {
 	@Resource
-	BoardService boardService;
+	private BoardService boardService;
 
 	@RequestMapping("/test")
 	public Board test() {
@@ -59,7 +59,7 @@ public class BoardController {
 		return map;
 	}
 
-	@GetMapping("/(bno)")
+	@GetMapping("/{bno}")
 	public Board read(@PathVariable int bno, @RequestParam(defaultValue = "false") boolean hit) {
 		log.info("실행");
 		Board board = boardService.getBoard(bno, hit);
@@ -84,6 +84,7 @@ public class BoardController {
 		return board;
 	}
 	
+	//multipart/form-data로 데이터를 전송할 때에는 PUT, PATCH 사용 불가능
 	@PostMapping("/update")
 	public Board update(Board board) {
 		log.info("실행");
@@ -113,6 +114,7 @@ public class BoardController {
 	
 	@GetMapping("/battach/{bno}")
 	public void download(@PathVariable int bno, HttpServletResponse response) {
+		log.info("실행");
 		try {
 			Board board = boardService.getBoard(bno, false);
 			String battachoname = board.getBattachoname();
@@ -133,6 +135,7 @@ public class BoardController {
 			is.close();
 			os.flush();
 			os.close();
+			HashMap<String,String> map = new HashMap();
 		}catch(Exception e) {
 		}
 	}

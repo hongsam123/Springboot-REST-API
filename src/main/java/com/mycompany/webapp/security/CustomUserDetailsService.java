@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.mycompany.webapp.dao.MemberDao;
 import com.mycompany.webapp.dto.Member;
+import com.mycompany.webapp.security.CustomUserDetails;
 
 import lombok.extern.java.Log;
 
@@ -30,7 +31,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 		if(member == null) {
 			throw new UsernameNotFoundException(username);
 		}
-		
+
 		List<GrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority(member.getMrole()));
 		CustomUserDetails userDetails = new CustomUserDetails(
@@ -39,6 +40,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 				member.isMenabled(),
 				authorities,
 				member.getMemail());
+		log.info(authorities.toString());
 		return userDetails;
 	}
 }
+

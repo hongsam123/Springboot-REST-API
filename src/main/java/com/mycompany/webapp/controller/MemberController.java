@@ -27,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/member")
 @Slf4j
 public class MemberController {
-	
 	@Resource
 	private MemberService memberService;
 	
@@ -38,53 +37,63 @@ public class MemberController {
 	private AuthenticationManager authenticationManager;
 	
 	@RequestMapping("/join1")
-	public Map<String,String> join1(Member member) {
+	public Map<String, String> join1(Member member) {
 		log.info("실행");
 		member.setMenabled(true);
 		member.setMpassword(passwordEncoder.encode(member.getMpassword()));
 		JoinResult jr = memberService.join(member);
-		Map<String,String> map = new HashMap<>();
-		if(jr==JoinResult.SUCCESS) {
-			map.put("result", "success");
-		} else if(jr==JoinResult.DUPLICATED) {
-			map.put("result", "duplicated");
-		} else {
-			map.put("result", "fail");
+		Map<String, String> result = new HashMap<>();
+		if(jr == JoinResult.SUCCESS) {
+			result.put("result","success");
 		}
-		return map;
+		else if(jr == JoinResult.DUPLICATED) {
+			result.put("result","duplicated");
+		}
+		else if(jr == JoinResult.FAIL) {
+			result.put("result","fail");
+		}
+		return result;
 	}
 	
 	@RequestMapping("/join2")
-	public Map<String,String> join2(@RequestBody Member member) {
-		log.info("실행");
+	public Map<String, String> join2(@RequestBody Member member) {
 		return join1(member);
 	}
 	
 	@RequestMapping("/login1")
-	public Map<String,String> login1(String mid,String mpassword) {
+	public Map<String, String> login1(String mid, String mpassword) {
 		log.info("실행");
-		if(mid==null || mpassword==null) {
-			throw new BadCredentialsException("아이디 또는 패스워드가 제공되지 않았음");
+		
+		if(mid == null || mpassword == null) {
+			throw new BadCredentialsException("아이디 또는 비밀번호가 제공되지 않았음"); 
+			// spring security에서 아이디랑 비밀번호가 맞지 않은 경우 BadCredentialsException 발생
 		}
-		//Spring Security 사용자 인증
-		UsernamePasswordAuthenticationToken token = 
-				new UsernamePasswordAuthenticationToken(mid,mpassword);
-		Authentication authentication = authenticationManager.authenticate(token);
+		//spring security 사용자 인증
+		 
+		// 아이디와 패스워드를 통해 토큰을 만든다
+		log.info("1");
+		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(mid, mpassword); 
+
+		log.info(token.toString());
+		Authentication authentication  = authenticationManager.authenticate(token); 
+		log.info("3");
 		SecurityContext securityContext = SecurityContextHolder.getContext();
+		log.info("4");
 		securityContext.setAuthentication(authentication);
-		//응답 내용
+		// 사용자 권한 얻기
 		String authority = authentication.getAuthorities().iterator().next().toString();
-		log.info(authority);
-		Map<String,String> map = new HashMap<>();
-		map.put("result", "success");
+		
+		Map<String, String> map = new HashMap<>();
+		map.put("result", "sucess");
 		map.put("mid", mid);
+		
 		map.put("jwt", JwtUtil.createToken(mid, authority));
 		return map;
 	}
 	
 	@RequestMapping("/login2")
-	public Map<String,String> login2(@RequestBody Member member) {
-		log.info("실행");
-		return login1(member.getMid(),member.getMpassword());
+	public Map<String, String> login2(@RequestBody Member member) {
+
+		return login1(member.getMid(), member.getMpassword());
 	}
 }
