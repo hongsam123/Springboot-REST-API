@@ -135,11 +135,11 @@
 						method: "post",
 						data: JSON.stringify({mid, mpassword}),
 						contentType: "application/json",
-						processData: false //data를 QueryString으로 표현하지 않음
+						processData: false //dat a를 QueryString으로 표현하지 않음
 					}).done((data) => {
 						console.log(data);
-						//sessionStorage.setItem("mid", data.mid);
-					   // sessionStorage.setItem("jwt", data.jwt);
+						sessionStorage.setItem("mid", data.mid);
+					    sessionStorage.setItem("jwt", data.jwt);
 					});
 				}
 			</script>

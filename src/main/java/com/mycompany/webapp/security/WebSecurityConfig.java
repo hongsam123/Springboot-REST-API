@@ -12,10 +12,16 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.mycompany.webapp.controller.JwtCheckFilter;
 import com.mycompany.webapp.service.CustomUserDetailsService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +48,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests()
 			.antMatchers("/board/**").authenticated()
 			.antMatchers("/**").permitAll();
+		
+		//세션 비활성화
+		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		
+		//JwtCheckFilter 추가
+		JwtCheckFilter jwtCheckFilter = new JwtCheckFilter();
+		http.addFilterBefore(jwtCheckFilter, UsernamePasswordAuthenticationFilter.class);
+		
+		//CORS 설정 활성화
+		http.cors();
 	}	
 	
 	@Override
@@ -76,8 +92,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Bean
 	@Override
-	protected AuthenticationManager authenticationManager() throws Exception {
-		return super.authenticationManager();
+	public AuthenticationManager authenticationManager() throws Exception {
+		return super.authenticationManagerBean();
 	}
 	
 	@Bean
@@ -88,6 +104,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		return roleHierarchyImpl;
 	}
 			
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration conf = new CorsConfiguration(); 
+		//모든 요청 사이트 허용
+		conf.addAllowedOrigin("*");
+		//모든 요청 방식 허용
+		conf.addAllowedMethod("*");
+		//모든 요청 헤드 허용
+		conf.addAllowedHeader("*");
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", conf);
+		return source;
+	}
 }
  
  
